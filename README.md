@@ -1,6 +1,6 @@
 # smart-bird-feeder
 
-
+Files for the Smart Bird Feeder project.
 
 ## Getting started
 
