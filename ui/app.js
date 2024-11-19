@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const db = require("./database");
 const app = express();
 
 app.get("/", (req, res) => {
@@ -8,6 +9,16 @@ app.get("/", (req, res) => {
 
 app.get("/activity", (req, res) => {
   res.sendFile(path.join(__dirname, "activity.html"));
+});
+
+app.get("/sensor-data", (req, res) => {
+  db.all("SELECT value, status FROM activity", [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
 });
 
 app.listen(3000, () => {

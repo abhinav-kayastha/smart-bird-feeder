@@ -3,11 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Bird Feeder</title>
+  <title>Activity Monitor</title>
 </head>
 <body>
-  <h1>Monitor Activity</h1>
-  <p>Here you can monitor the activity of the bird feeder.</p>
+  <h1>Activity Monitor</h1>
+  <p>Here you can monitor the activity of the Smart Bird Feeder.</p>
   <button onclick="window.location.href='/'">Home</button>
+  <h2>Sensor Data</h2>
+  <ul id="sensor-data">Loading...</ul>
+
+  <script>
+    async function fetchSensorData() {
+      try {
+        const response = await fetch('/sensor-data');
+        const data = await response.json();
+        const sensorDataList = document.getElementById('sensor-data');
+        sensorDataList.innerHTML = '';
+        data.data.forEach(item => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `ID: ${item.id}, Value: ${item.value}`;
+          sensorDataList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error fetching sensor data:', error);
+        document.getElementById('sensor-data').innerText = 'Error loading sensor data';
+      }
+    }
+
+    // Fetch sensor data on page load
+    window.onload = fetchSensorData;
+  </script>
 </body>
 </html>
