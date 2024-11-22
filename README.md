@@ -43,7 +43,7 @@ Follow these steps to set up and contribute to the project:
 	```
 2. Navigate to the project directory:
    ```bash
-	cd <local repo>
+	cd smart-bird-feeder
 	```
 3. Set the upstream remote (if not already set):
    ```bash
