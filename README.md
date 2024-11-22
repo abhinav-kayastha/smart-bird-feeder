@@ -72,7 +72,7 @@ To ensure a clean and collaborative development process, the team will use the *
 
 3. **Push Your Branch**:
    - Push your branch to the remote repository:
-     ```bash
+   ```bash
 	git push origin feature/your-feature-name
 	```
 
@@ -84,7 +84,7 @@ To ensure a clean and collaborative development process, the team will use the *
 
 6. **Keep Your Branch Updated**:
    - Regularly pull updates from `main` to your feature branch to avoid conflicts:
-     ```bash
+   ```bash
 	git pull upstream main
 	```
 
