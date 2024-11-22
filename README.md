@@ -18,6 +18,7 @@ This project aims to develop a Smart Bird Feeder system that incorporates IoT te
 ## System Components
 
 1. **Hardware**:
+   - µCU: Microchip PIC24F16KM202
    - Sensors: Micro Switch, ToF Presence Sensor
    - Actuator: Servo motor
    - LoRa module for wireless communication.
