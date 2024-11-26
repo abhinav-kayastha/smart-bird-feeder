@@ -4,15 +4,15 @@ const db = require("./config/database");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "views/index.html"));
 });
 
 app.get("/activity", (req, res) => {
-  res.sendFile(path.join(__dirname, "activity.html"));
+  res.sendFile(path.join(__dirname, "views/activity.html"));
 });
 
 app.get("/sensor-data", (req, res) => {
-  db.all("SELECT value, status FROM activity", [], (err, rows) => {
+  db.all("SELECT time, status FROM activity", [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
