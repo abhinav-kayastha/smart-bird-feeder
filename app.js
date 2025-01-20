@@ -1,8 +1,9 @@
 const express = require("express");
 const path = require("path");
 const passport = require("./config/passport");
-const db = require("./config/database");
 const session = require("express-session");
+const db = require("./config/database");
+const readline = require("readline");
 const app = express();
 
 // Middleware for parsing request bodies
@@ -57,4 +58,35 @@ function ensureAuthenticated(req, res, next) {
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
+  promptUserInput(); // Start prompting user input after the server starts
 });
+
+// Function to prompt user input from the console
+function promptUserInput() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  rl.question("Enter status: ", (status) => {
+    const datetime = new Date().toLocaleString();
+    insertStatus(datetime, status);
+    rl.close();
+    promptUserInput(); // Prompt again for continuous input
+  });
+}
+
+// Function to insert status and datetime into the database
+function insertStatus(datetime, status) {
+  db.run(
+    "INSERT INTO activity (time, status) VALUES (?, ?)",
+    [datetime, status],
+    (err) => {
+      if (err) {
+        console.error("Error inserting data:", err.message);
+      } else {
+        console.log("Data inserted successfully");
+      }
+    }
+  );
+}
