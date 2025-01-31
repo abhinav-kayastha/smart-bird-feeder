@@ -1,0 +1,30 @@
+% Abbreviation and Glossary
+% Normally, you don't have to modify this file. Your abbreviations, etc. goes in
+% ../chapters/0abbr.tex file.
+
+\begin{singlespacing}
+
+	% \gsladdall%would add all terms even if not used in your text.
+	\addtocontents{toc}{\cftpagenumbersoff{chapter}}
+	{
+		\vspace{-.46cm}
+		\titleformat{\section}
+		{\fontsize{13.5pt}{13.5pt}\bfseries\normalfont}
+		{\thesection}{.5cm}{}
+		\renewcommand*{\glossarypreamble}{\vspace{.7\baselineskip}}
+		%Adapt labelwidth (sorry for the ugly hack)
+		\setlist[description]{leftmargin=!, labelwidth=4em, before=\doublespacing}
+		\IfLanguageName {finnish} {
+			\printacronyms[title=Lyhenteet, nogroupskip]
+			}{
+			\printacronyms[title=List of Abbreviations, nogroupskip]
+		}
+		\setlist[description]{leftmargin=!, labelwidth=7em, before=\doublespacing}
+		\vspace{1cm}
+		\printglossary[nogroupskip]
+		\setlist[description]{style=standard} % reset settings back to default
+	}
+	\addtocontents{toc}{\cftpagenumberson{chapter}}
+\end{singlespacing}
+
+\clearpage

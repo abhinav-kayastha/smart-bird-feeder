@@ -1,0 +1,39 @@
+% License of your thesis
+% If you wish to explain what it means. When you publish your thesis in https://theseus.fi
+% you will be able to choose between some Creative Commons licenses
+% https://creativecommons.org
+% Adapt this example text to your taste.
+% This would also be the right place to explain the license you choose for the code you
+% produced for your thesis.
+
+\pagestyle{empty}
+\chapter*{Licenses}
+\ifdefstring{\thesiscopy}{all}{}{%
+  \begin{wrapfigure}{r}{0.3\textwidth}
+    \vspace{-20pt}
+    \doclicenseImage
+  \end{wrapfigure}
+ }
+\IfLanguageName{finnish}{\copyfi}{\copyen}
+
+That means:
+
+%adapt to the license you choose. In this example: https://creativecommons.org/licenses/by-sa/4.0/deed.en
+\textbf{You are free to:}
+\begin{itemize}
+\item Share \textemdash copy and redistribute the material in any medium or format
+\item Adapt \textemdash remix, transform, and build upon the material
+\end{itemize}
+
+\textbf{Under the following terms:}
+\begin{itemize}
+\item \ccAttribution~ Attribution \textemdash You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+\item \ccShareAlike~ ShareAlike \textemdash If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+\item No additional restrictions \textemdash You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+\item Any of the above conditions can be waived if you get my permission
+\end{itemize}
+
+%Eventually consider few words why you choose such license? E.g. something like:
+I decided to publish my thesis work under the Creative Commons Attribution-ShareAlike 4.0 International License because I strongly believe that you as reader deserve the freedom to copy, share and modify this work and if you do modify it, it is fair to give these same permissions to the others. A copy in electronic form of this work can be found in \url{https://some.place} with the \LaTeX{} source.
+
+\clearpage
