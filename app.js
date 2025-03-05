@@ -1,33 +1,18 @@
 const express = require("express");
 const mqtt = require("mqtt");
 const path = require("path");
-const util = require("util");
-const fs = require("fs");
 const bodyParser = require("body-parser");
 const db = require("./config/database");
 const app = express();
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-
 // Create variables for MQTT use here
-const address = "mqtt://18.198.188.151:21883";
-const topic = "abhinav/LED";
+const address = "mqtt://localhost:1883";
+const topic = "iot/timestamp_status";
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, "public")));
-
-function read(filePath = "./message.json") {
-  return readFile(path.resolve(__dirname, filePath)).then((data) =>
-    JSON.parse(data)
-  );
-}
-
-function write(data, filePath = "./message.json") {
-  return writeFile(path.resolve(__dirname, filePath), JSON.stringify(data));
-}
 
 // create an MQTT instance
 const client = mqtt.connect(address, {
@@ -50,18 +35,48 @@ client.on("error", (error) => {
 
 // Handle when a subscribed message comes in (message event)
 client.on("message", (topic, message) => {
-  // event will trigger when client gets a msg from
-  // the topic they sub to
-  console.log(message.toString());
-  // when msg is received, it is added to the message.json file
-  // read, then push, then write
-  read().then((messages) => {
-    messages.push({
-      id: new Date().getTime().toString(),
-      msg: message.toString(),
-    });
-    write(messages);
-  });
+  try {
+    // Parse the JSON message
+    const parsedMessage = JSON.parse(message.toString());
+
+    // Extract the relevant fields
+    const extractedData = {
+      data: parsedMessage.data,
+      time: new Date().toISOString(),
+    };
+
+    // Log the extracted data
+    console.log("Extracted Data:", extractedData);
+
+    // Insert extracted data into 'time' table
+    db.run(
+      "INSERT INTO activity (time) VALUES (?)",
+      [extractedData.time],
+      function (err) {
+        if (err) {
+          return console.error("Error inserting into time table:", err.message);
+        }
+        console.log(`Inserted time record with ID: ${this.lastID}`);
+      }
+    );
+
+    // Insert extracted data into 'activity' table
+    db.run(
+      "INSERT INTO activity (time, status) VALUES (?, ?)",
+      [extractedData.time, extractedData.data],
+      function (err) {
+        if (err) {
+          return console.error(
+            "Error inserting into activity table:",
+            err.message
+          );
+        }
+        console.log(`Inserted activity record with ID: ${this.lastID}`);
+      }
+    );
+  } catch (error) {
+    console.error("Error processing MQTT message:", error.message);
+  }
 });
 
 // Route to serve the home page
