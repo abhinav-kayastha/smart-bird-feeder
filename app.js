@@ -17,6 +17,8 @@ const topic = "abhinav/LED";
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use(express.static(path.join(__dirname, "public")));
+
 function read(filePath = "./message.json") {
   return readFile(path.resolve(__dirname, filePath)).then((data) =>
     JSON.parse(data)
