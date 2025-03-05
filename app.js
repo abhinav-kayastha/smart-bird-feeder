@@ -15,16 +15,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // create an MQTT instance
-const client = mqtt.connect(address, {
-  clientId: "abhinav",
-  username: "SmartIoT",
-  password: "SmartIoTMQTT",
-}); // connecting to mqtt broker, using the clientId: abhinav
+const client = mqtt.connect(address); // connecting to mqtt broker
 
 // Check that you are connected to MQTT and subscribe to a topic (connect event)
 client.on("connect", () => {
   //when connect
-  client.subscribe(topic); // then subscribes to topic abhinav
+  client.subscribe(topic);
   console.log("connected to MQTT"); // prints that it connects to MQTT
 });
 
