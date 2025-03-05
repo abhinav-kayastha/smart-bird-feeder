@@ -4,8 +4,6 @@ const path = require("path");
 const util = require("util");
 const fs = require("fs");
 const bodyParser = require("body-parser");
-const passport = require("./config/passport");
-const session = require("express-session");
 const db = require("./config/database");
 const app = express();
 
@@ -18,19 +16,6 @@ const topic = "abhinav/LED";
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Initialize session middleware
-app.use(
-  session({
-    secret: "your_secret_key",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-// Initialize Passport and restore authentication state, if any, from the session
-app.use(passport.initialize());
-app.use(passport.session());
 
 function read(filePath = "./message.json") {
   return readFile(path.resolve(__dirname, filePath)).then((data) =>
@@ -69,7 +54,10 @@ client.on("message", (topic, message) => {
   // when msg is received, it is added to the message.json file
   // read, then push, then write
   read().then((messages) => {
-    messages.push({ id: new Date().getTime().toString(), msg: message.toString() });
+    messages.push({
+      id: new Date().getTime().toString(),
+      msg: message.toString(),
+    });
     write(messages);
   });
 });
@@ -79,7 +67,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views/index.html"));
 });
 
-app.get("/activity", ensureAuthenticated, (req, res) => {
+app.get("/activity", (req, res) => {
   res.sendFile(path.join(__dirname, "views/activity.html"));
 });
 
@@ -92,22 +80,6 @@ app.get("/sensor-data", (req, res) => {
     res.json({ data: rows });
   });
 });
-
-// Login route
-app.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/activity",
-    failureRedirect: "/",
-  })
-);
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect("/");
-}
 
 // Route to serve the JSON array from the file message.json when requested from the home page
 app.get("/messages", async (req, res) => {
