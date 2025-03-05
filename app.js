@@ -41,24 +41,12 @@ client.on("message", (topic, message) => {
 
     // Extract the relevant fields
     const extractedData = {
-      data: parsedMessage.data,
+      data: parsedMessage.status,
       time: new Date().toISOString(),
     };
 
     // Log the extracted data
     console.log("Extracted Data:", extractedData);
-
-    // Insert extracted data into 'time' table
-    db.run(
-      "INSERT INTO activity (time) VALUES (?)",
-      [extractedData.time],
-      function (err) {
-        if (err) {
-          return console.error("Error inserting into time table:", err.message);
-        }
-        console.log(`Inserted time record with ID: ${this.lastID}`);
-      }
-    );
 
     // Insert extracted data into 'activity' table
     db.run(
@@ -96,45 +84,6 @@ app.get("/sensor-data", (req, res) => {
     }
     res.json({ data: rows });
   });
-});
-
-// Route to serve the JSON array from the file message.json when requested from the home page
-app.get("/messages", async (req, res) => {
-  const messages = await read();
-  res.json(messages);
-});
-
-// Route to serve the page to add a message
-app.get("/add", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./message.html"));
-});
-
-// Route to show a selected message. Note, it will only show the message as text. No html needed
-app.get("/:id", async (req, res) => {
-  const messages = await read(); // reads the current messages
-  const message = messages.find((m) => m.id === req.params.id);
-  res.send(message);
-});
-
-// Route to CREATE a new message on the server and publish to mqtt broker
-app.post("/", async (req, res) => {
-  const newMessage = { id: new Date().getTime().toString(), msg: req.body.msg };
-  const messages = await read();
-  messages.push(newMessage);
-  await write(messages);
-  client.publish(req.body.topic || topic, newMessage.msg);
-  res.sendStatus(200);
-});
-
-// Route to delete a message by id
-app.delete("/:id", async (req, res) => {
-  try {
-    const messages = await read();
-    await write(messages.filter((c) => c.id !== req.params.id));
-    res.sendStatus(200);
-  } catch (e) {
-    res.sendStatus(500);
-  }
 });
 
 app.listen(3000, () => {
