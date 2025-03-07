@@ -44,7 +44,7 @@ client.on("message", (topic, message) => {
     // Extract the relevant fields
     const extractedData = {
       data: decodedData,
-      time: new Date().toLocaleString(),
+      time: new Date().toISOString(),
     };
 
     // Log the extracted data
@@ -52,7 +52,7 @@ client.on("message", (topic, message) => {
 
     // Insert extracted data into 'activity' table
     db.run(
-      "INSERT INTO activity (time, status) VALUES (?, ?)",
+      "INSERT INTO activity (timestamp, status) VALUES (?, ?)",
       [extractedData.time, extractedData.data],
       function (err) {
         if (err) {
@@ -79,13 +79,27 @@ app.get("/activity", (req, res) => {
 });
 
 app.get("/sensor-data", (req, res) => {
-  db.all("SELECT time, status FROM activity", [], (err, rows) => {
+  db.all("SELECT timestamp, status FROM activity", [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
     res.json({ data: rows });
   });
+});
+
+app.get("/latest-state", (req, res) => {
+  db.get(
+    "SELECT status FROM activity ORDER BY timestamp DESC LIMIT 1",
+    [],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ state: row ? row.status : "UNKNOWN" });
+    }
+  );
 });
 
 app.listen(3000, () => {
