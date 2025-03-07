@@ -23,8 +23,8 @@
             try {
                 const response = await fetch('/latest-state');
                 const data = await response.json();
-                document.getElementById('device-state').textContent = data.state;
-                document.getElementById('battery-status').textContent = data.battery;
+                document.getElementById('device-state').textContent = `State: ${data.state}`;
+                document.getElementById('battery-status').textContent = `Battery: ${data.battery}%`;
             } catch (error) {
                 console.error('Error fetching latest state:', error);
                 document.getElementById('device-state').textContent = 'Error fetching state';

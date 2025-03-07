@@ -30,7 +30,6 @@ client.on("error", (error) => {
 });
 
 client.on("message", (topic, message) => {
-  console.log("Received message:", message.toString());
   try {
     // Parse the JSON message
     const parsedMessage = JSON.parse(message.toString());
@@ -42,9 +41,12 @@ client.on("message", (topic, message) => {
     const decodedData = Buffer.from(base64Data, "base64").toString("utf-8");
 
     // Extract the relevant fields
+    const currentTime = new Date().toLocaleString();
+    console.log("Current Time:", currentTime);
+
     const extractedData = {
       data: decodedData,
-      time: new Date().toISOString(),
+      time: currentTime,
     };
 
     // Log the extracted data
@@ -53,9 +55,12 @@ client.on("message", (topic, message) => {
     // Check if the data contains BATT=
     if (extractedData.data.includes("BATT=")) {
       // Insert battery status into battery column
+      const rawValue = parseInt(extractedData.data.split("BATT=")[1], 10);
+      const batteryPercent = convertAdcRawToBatteryPercent(rawValue);
+      console.log(`Battery Percentage: ${batteryPercent}%`);
       db.run(
         "INSERT INTO battery (battery) VALUES (?)",
-        [extractedData.data],
+        [batteryPercent],
         function (err) {
           if (err) {
             return console.error(
@@ -108,10 +113,9 @@ app.get("/sensor-data", (req, res) => {
 
 app.get("/latest-state", (req, res) => {
   db.get(
-    "SELECT status FROM activity ORDER BY timestamp DESC LIMIT 1",
+    "SELECT status FROM activity ORDER BY rowid DESC LIMIT 1",
     [],
     (err, activityRow) => {
-      console.log(activityRow);
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -120,7 +124,6 @@ app.get("/latest-state", (req, res) => {
         "SELECT battery FROM battery ORDER BY rowid DESC LIMIT 1",
         [],
         (err, batteryRow) => {
-          console.log(batteryRow);
           if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -138,3 +141,27 @@ app.get("/latest-state", (req, res) => {
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
+
+function convertAdcRawToBatteryPercent(raw) {
+  const BATTERY_MIN_VOLTAGE = 6.0;
+  const BATTERY_MAX_VOLTAGE = 12.0;
+
+  // Convert raw to approximate voltage
+  const volts = (raw / 1023.0) * 3.3 * 11.0;
+
+  // Map [6.0..12.0 V] to [0..100%]
+  let percent;
+  if (volts <= BATTERY_MIN_VOLTAGE) {
+    percent = 0.0;
+  } else if (volts >= BATTERY_MAX_VOLTAGE) {
+    percent = 100.0;
+  } else {
+    percent =
+      ((volts - BATTERY_MIN_VOLTAGE) /
+        (BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE)) *
+      100.0;
+  }
+
+  // Round to two decimal places
+  return Math.round(percent * 100) / 100;
+}
