@@ -6,8 +6,8 @@ const db = require("./config/database");
 const app = express();
 
 // Create variables for MQTT use here
-const address = "mqtt://localhost:1883";
-const topic = "iot/timestamp_status";
+const address = "mqtt://192.168.50.192:1883";
+const topic = "application/+/device/+/rx";
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
@@ -29,16 +29,22 @@ client.on("error", (error) => {
   console.log("Error: ", error);
 });
 
-// Handle when a subscribed message comes in (message event)
 client.on("message", (topic, message) => {
+  console.log("Received message:", message.toString());
   try {
     // Parse the JSON message
     const parsedMessage = JSON.parse(message.toString());
 
+    // Extract the base64 encoded data
+    const base64Data = parsedMessage.data;
+
+    // Decode the base64 data
+    const decodedData = Buffer.from(base64Data, "base64").toString("utf-8");
+
     // Extract the relevant fields
     const extractedData = {
-      data: parsedMessage.status,
-      time: new Date().toISOString(),
+      data: decodedData,
+      time: new Date().toLocaleString(),
     };
 
     // Log the extracted data
