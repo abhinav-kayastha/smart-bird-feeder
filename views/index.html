@@ -15,6 +15,8 @@
 
     <h2>Device State</h2>
     <p id="device-state">Loading...</p>
+    <h2>Battery Status</h2>
+    <p id="battery-status">Loading...</p>
 
     <script>
         async function fetchLatestState() {
@@ -22,9 +24,11 @@
                 const response = await fetch('/latest-state');
                 const data = await response.json();
                 document.getElementById('device-state').textContent = data.state;
+                document.getElementById('battery-status').textContent = data.battery;
             } catch (error) {
                 console.error('Error fetching latest state:', error);
                 document.getElementById('device-state').textContent = 'Error fetching state';
+                document.getElementById('battery-status').textContent = 'Error fetching battery status';
             }
         }
 

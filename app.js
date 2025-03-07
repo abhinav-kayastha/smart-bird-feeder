@@ -50,20 +50,38 @@ client.on("message", (topic, message) => {
     // Log the extracted data
     console.log("Extracted Data:", extractedData);
 
-    // Insert extracted data into 'activity' table
-    db.run(
-      "INSERT INTO activity (timestamp, status) VALUES (?, ?)",
-      [extractedData.time, extractedData.data],
-      function (err) {
-        if (err) {
-          return console.error(
-            "Error inserting into activity table:",
-            err.message
-          );
+    // Check if the data contains BATT=
+    if (decodedData.includes("BATT=")) {
+      // Insert battery status into battery column
+      db.run(
+        "INSERT INTO activity (timestamp, battery) VALUES (?, ?)",
+        [extractedData.time, extractedData.data],
+        function (err) {
+          if (err) {
+            return console.error(
+              "Error inserting into battery table:",
+              err.message
+            );
+          }
+          console.log(`Inserted battery record with ID: ${this.lastID}`);
         }
-        console.log(`Inserted activity record with ID: ${this.lastID}`);
-      }
-    );
+      );
+    } else {
+      // Insert locked/unlocked status to status column
+      db.run(
+        "INSERT INTO activity (timestamp, status) VALUES (?, ?)",
+        [extractedData.time, extractedData.data],
+        function (err) {
+          if (err) {
+            return console.error(
+              "Error inserting into activity table:",
+              err.message
+            );
+          }
+          console.log(`Inserted activity record with ID: ${this.lastID}`);
+        }
+      );
+    }
   } catch (error) {
     console.error("Error processing MQTT message:", error.message);
   }
@@ -92,12 +110,25 @@ app.get("/latest-state", (req, res) => {
   db.get(
     "SELECT status FROM activity ORDER BY timestamp DESC LIMIT 1",
     [],
-    (err, row) => {
+    (err, activityRow) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
-      res.json({ state: row ? row.status : "UNKNOWN" });
+      db.get(
+        "SELECT battery FROM activity ORDER BY timestamp DESC LIMIT 1",
+        [],
+        (err, batteryRow) => {
+          if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+          }
+          res.json({
+            state: activityRow ? activityRow.status : "UNKNOWN",
+            battery: batteryRow ? batteryRow.battery : "UNKNOWN",
+          });
+        }
+      );
     }
   );
 });
