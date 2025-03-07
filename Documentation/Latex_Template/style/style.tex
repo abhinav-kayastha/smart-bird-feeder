@@ -1,0 +1,339 @@
+% Global style. Normally should not be edited.
+% If you use windows OS, eventually change \setmainfont to Arial
+% Check around commit https://github.com/panunu/metropolia-thesis-latex/commit/a0c15ac77bab1a52c59c517a18080938e57bf5ef
+% to see how the font files were manually added (after downloading them: https://pagure.io/liberation-fonts/ )
+
+%\usepackage[l2tabu, orthodox]{nag}%check for obsolete packages (with outdated nag package?)
+
+%condition e.g. for adding or not space in TOC,...
+\usepackage{etoolbox}
+\ifdefstring{\bilingual}{yes}{
+  \usepackage[\secondlang,\thesislang]{babel}% finnish (or swedish) and english
+}{
+  \usepackage[\thesislang]{babel}% english only
+}
+\usepackage{iflang}
+\usepackage{amsmath}
+\usepackage{amsfonts}%extra mathematical symbols
+\usepackage{amssymb}
+\usepackage{fontspec}
+\usepackage{titlesec}
+\usepackage{mathtools}%enhance the appearance of documents containing a lot of mathematics
+\usepackage[amssymb]{SIunits}
+\usepackage[version=3]{mhchem}
+\usepackage{tikz} % mindmaps, flowcharts, piecharts, examples at http://www.texample.net/tikz/examples/
+\usetikzlibrary{shapes.geometric, arrows}
+
+\usepackage{ragged2e}
+\IfLanguageName{finnish}{
+  \RaggedRight%2021 template, align left and hyphennization for Finnish version
+  \setlength{\RaggedRightRightskip}{0pt plus 1fil}%TODO: fix the Overfull/Underfull warnings when \RaggedRight (likely in title and abstact)
+}{}
+\makeatletter
+  \let\@gnewline\@raggedtwoe@saved@gnewline% Restore original functionality of \newline
+  \let\\\@raggedtwoe@savedcr% Restore original functionality of \\
+\makeatother
+
+%for compact list
+\usepackage{enumitem}
+%\usepackage{verbatim}%for block comment
+%forcing single line spacing in bibliography
+\DisemulatePackage{setspace}
+\usepackage{setspace}
+%\usepackage{eurosym}%euro symbol
+%try to count
+\usepackage{totcount}
+%insert source code
+%require -8bit -shell-escape in the xelatex compile command
+%if compiling locally, consider options cachedir=minted,outputdir=~/.tex
+\usepackage[newfloat]{minted}
+\setminted{tabsize=2,linenos,breaklines,breaksymbolleft={\quad},baselinestretch=1}
+\setmintedinline{breaklines,breakanywhere}
+\usepackage[singlelinecheck=false]{caption}
+%force the width of a table instead of column
+\usepackage{tabularx}
+\usepackage{booktabs} %why not booktabs? :3
+
+\usepackage{csquotes}% avoid warning with babel
+
+\usepackage{float} % For forced figure location with modifier H (\begin{figure}[H])
+\usepackage{wrapfig}
+
+% citep-macro for reference with period inside square brackets [1.]
+\newcommand{\citep}[1]{
+ \renewcommand\citeright{.]}
+ \cite{#1}
+ \renewcommand\citeright{]}
+}
+
+%set date format to D.M.YYYY
+\def\pvm{\the\day.\the\month.\the\year}
+%set date format to D Month YYYY
+\usepackage[en,useregional=false]{datetime2}
+\DTMsetup{datesep=.}
+\DTMnewdatestyle{dMonthyyyy}
+{%
+  \renewcommand{\DTMdisplaydate}[4]{%
+    \number##3 % day
+    ~% separator
+    \DTMenglishmonthname{##2}% month name
+    ~% separator
+    \number##1% year
+  }%
+  \renewcommand{\DTMDisplaydate}[4]{%
+    \DTMdisplaydate{##4}{##3}{##2}{##1}%
+  }%
+}
+\DTMsetdatestyle{dMonthyyyy}
+\date{\today}
+
+\newcommand\tn[1]{\textnormal{#1}} %use \tn instead of \textnormal
+\newcommand\reaction[1]{\begin{equation}\ce{#1}\end{equation}} %\reaction{} for chemical reactions
+
+%NORMAL TEXT
+%all text, title, etc. in the same font: Arial
+%NOTE: fontname is case-sensitive
+\setmainfont[Scale=0.98]{Liberation Sans}
+%line space
+\linespread{1.46}
+\AtBeginEnvironment{tabular}{\singlespacing}
+%\doublespacing
+%margin
+%geometry moved after hyperref
+\setlength{\parindent}{0pt} %first line of paragraph not indented
+\setlength{\parskip}{16.5pt} %one empty line to separate paragraph
+%list with small line space separation
+\tightlists
+\setlist[itemize]{before=\singlespacing,itemsep=6pt,leftmargin=63pt,labelsep=22pt,topsep=1.5pt,partopsep=0pt,after=\vspace{-22pt}\newline}
+\setlist[enumerate]{before=\singlespacing,itemsep=6pt,leftmargin=63pt,labelsep=22pt,topsep=1.5pt,partopsep=0pt,after=\vspace{-22pt}\newline}
+
+%IMAGE - FIGURE
+%the figures should be placed in the "illustration" folder
+\graphicspath{{illustration/}}
+%figure number without chapter (1.1, 1.2, 2.1) to (1, 2, 3)
+\counterwithout{figure}{chapter}
+%border around images
+\setlength\fboxsep{0pt}
+\setlength\fboxrule{0.5pt}
+%space after figure caption (and other float elements)
+\setlength{\belowcaptionskip}{-7pt}
+\setlength{\intextsep}{16.5pt}%space around floats
+\AtBeginEnvironment{table}{\addvspace{16.5pt}}
+
+%TABLE
+\counterwithout{table}{chapter}
+
+%SOURCE CODE
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\IfLanguageName{finnish}{\SetupFloatingEnvironment{listing}{name=Koodiesimerkki}}{}%was Listaus
+%\counterwithout{lstlisting}{chapter}
+%moved after begin document, otherwise does not compile
+
+%TOC
+%change toc title
+\IfLanguageName{finnish}{\addto{\captionsfinnish}{\renewcommand*{\contentsname}{Sisällys}}}{}
+%remove dots
+\renewcommand*{\cftdotsep}{\cftnodots}
+%chapter title and page number not in bold
+\renewcommand{\cftchapterfont}{\normalfont}
+\renewcommand{\cftchapterpagefont}{\normalfont}
+%sub section in toc
+\setcounter{tocdepth}{2}
+%subsection numbered
+\setcounter{secnumdepth}{2}
+\renewcommand{\tocheadstart}{\vspace*{-33.5pt}}
+\renewcommand{\printtoctitle}[1]{\fontsize{13.5pt}{13.5pt}\bfseries #1\vspace*{-4pt}}
+%\renewcommand{\aftertoctitle}{\vspace*{-22pt}\afterchaptertitle}
+%spacing after a chapter in toc
+\preto\section{%
+  \ifnum\value{section}=0\addtocontents{toc}{\vskip11pt}\fi
+}
+%spacing after a section in toc
+\renewcommand{\cftsectionaftersnumb}{\vspace*{-3pt}}
+%spacing after a subsection in toc
+\renewcommand{\cftsubsectionaftersnumb}{\vspace*{-1pt}}
+%appendix in toc with "Appendix " + num
+\IfLanguageName{finnish}{
+  \renewcommand*{\cftappendixname}{Liite\space}
+  \renewcommand{\appendixtocname}{Liitteet}
+}{\renewcommand*{\cftappendixname}{Appendix\space}}
+%appendix header
+\IfLanguageName{finnish}{\def\appname{Liite\space}}{\def\appname{Appendix\space}}
+
+%TITLES
+%chapter title
+%\clearforchapter{\clearpage}
+\titleformat{\chapter}
+{\fontsize{14pt}{14pt}\bfseries\linespread{1}}%\clearpage
+{\thechapter}{.5cm}{}
+\titlespacing*{\chapter}{0pt}{-.42cm}{.5pt}
+\titleformat{\section}
+{\fontsize{13.5pt}{13.5pt}\normalfont}
+{\thesection}{.5cm}{}
+\titlespacing*{\section}{0pt}{9pt}{0pt}
+\titleformat{\subsection}
+{\fontsize{12.7pt}{12.7pt}\normalfont}
+{\thesubsection}{.5cm}{}
+\titlespacing*{\subsection}{0pt}{11pt}{0pt}
+
+
+%QUOTE
+\renewenvironment{quote}
+{\list{}{\rightmargin=0pt\leftmargin=2.2cm\topsep=-14pt}%
+  \item\relax\singlespacing}%\fontsize{10pt}{10pt}
+    {\vspace{8pt}\endlist}
+
+%BIBLIOGRAPHY
+%TODO: toggle for Harward v.s. Vancouver
+\usepackage[
+backend=biber,
+bibencoding=utf8,%
+citetracker=true,%
+isbn=false,%
+doi=false,%
+url=true,%
+usetranslator=true,%
+bibstyle=ext-authoryear,%
+citestyle=numeric-comp,%
+sorting=none,%
+sortcites=true,%
+block=none,%
+terseinits=false,%
+giveninits=false,%
+maxbibnames=99,%
+]{biblatex}
+
+\setlength{\bibitemsep}{11pt}
+\setlength{\biblabelsep}{1cm}%with 1cm horizontal gap
+
+\makeatletter
+\RequireBibliographyStyle{numeric}
+\makeatother
+
+% set right format
+\renewcommand*{\multicitedelim}{;\space}
+\renewcommand*{\multinamedelim}{;\space}
+\renewcommand*{\finalnamedelim}{~\&\space}
+\DeclareFieldFormat{biblabeldate}{#1}
+\DeclareDelimFormat[bib]{nameyeardelim}{\addperiod\space}
+%\DeclareNameAlias{sortname}{last-first} % deprecated
+\DeclareNameAlias{default}{family-given}
+\DeclareFieldFormat{labelnumberwidth}{#1} % remove () from label number
+\DeclareFieldFormat{title}{#1} % normal font for title
+\DeclareFieldFormat{citetitle}{#1}
+\DeclareFieldFormat{journaltitle}{#1} % remove underline
+\DeclareFieldFormat*{url}{%
+\ifentrytype{online}{\IfLanguageName{finnish}{Verkkoaineisto}{Online}\addperiod\space}{}%
+\ifentrytype{video}{Video\addperiod\space}{}%
+\textless\url{#1}\textgreater\addperiod
+} % you can modify how to url looks here
+%TODO: remove leading 0 for day and month for Finnish dates
+\DeclareFieldFormat{urldate}{\space\bibstring{urlseen}\space#1} % remove () from date
+%try set translation to biblio
+\DefineBibliographyStrings{english}{%
+    urlfrom = {available at},%
+    urlseen = {Visited on},%
+    fromenglish = {from English},%
+    fromfinnish = {from Finnish},%
+    fromgerman = {from German},%
+    fromjapanese = {from Japanese},%
+}
+\DefineBibliographyStrings{finnish}{%
+  %  urlfrom={Linkki: },%
+    urlfrom = {},%
+    urlseen = {Luettu},%
+    fromjapanese = {japanista},%
+    fromenglish = {englannista},%
+    fromfinnish = {suomesta},%
+    fromgerman = {saksasta},%
+}
+{
+  %new cite command: "Vancouver Short"
+  \DeclareCiteCommand{\citeVS}
+    {\usebibmacro{prenote}}
+    {\usebibmacro{author}, \usebibmacro{title}}
+    {\multicitedelim}
+    {\usebibmacro{postnote}}
+
+  % new cite command: "Vancouver Short Collection" - necessary when referencing whole collections.
+  \DeclareCiteCommand{\citeVSc}
+    {\usebibmacro{prenote}}
+    {\usebibmacro{editor}, \usebibmacro{title}}
+    {\multicitedelim}
+    {\usebibmacro{postnote}}
+}
+
+% when citing multiple sentences/entire paragraph, add a dot inside the brackets
+\DeclareCiteCommand{\citep}[\mkbibbrackets]
+  {\usebibmacro{cite:init}%
+    \usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+     \usebibmacro{cite:comp}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}\addperiod}
+
+\addbibresource{biblio.bib}% for biblatex you need out \printbibliography too
+
+%count the appendices (since the chapter counter is reset after \appendix).
+%! require to complie 2 times
+\regtotcounter{chapter}
+
+% metadata (title, author, lang,...) for accessibility, etc.
+\usepackage{hyperref}
+\usepackage{hyperxmp}
+\def\isolang{\IfLanguageName{finnish}{fi}{en}} %iso code (based on main language)
+\ifdefstring{\thesiscopy}{all}{%
+    \def\copyen{Copyright \textcopyright\ \the\year{}, \theauthor}
+    \def\copyfi{Kaikki oikeudet pidätetään.  \textcopyright\ \the\year{}, \theauthor}
+  }{%
+    \usepackage[type={CC},modifier={\thesiscopy},version={4.0},]{doclicense}
+    \def\copyen{\thetitle\ \textcopyright\ \the\year{} by \theauthor\ is licensed under \doclicenseLongNameRef}
+    \def\copyfi{\otsikko\ \textcopyright\ \the\year{}, jonka tekijä on \theauthor, on lisensoitu \doclicenseLongNameRef}
+}
+\hypersetup{%
+  pdfdisplaydoctitle,
+  %breaklinks=true,%searching for overfull warnings
+  pdfencoding=auto,
+  bookmarksdepth=subsection,
+  unicode=true,
+  keeppdfinfo=true,
+  pdflang={\isolang},
+  pdfmetalang={\isolang},
+  pdftitle={\IfLanguageName{finnish}{\otsikko}{\thetitle}},
+  pdfkeywords={\IfLanguageName{finnish}{\avainsanat}{\metropoliakeywords}},
+  pdfcopyright={\IfLanguageName{finnish}{\copyfi}{\copyen}},
+  pdfsubject={\IfLanguageName{finnish}{\aihe}{\subject}},
+}
+
+\ifdefstring{\bilingual}{yes}{%metadata (title and copyright) in multiple language
+  \XMPLangAlt{\IfLanguageName{finnish}{en}{fi}}{%
+    pdftitle={\IfLanguageName{finnish}{\thetitle}{\otsikko}},
+    pdfcopyright={\IfLanguageName{finnish}{\copyen}{\copyfi}},
+    pdfsubject={\IfLanguageName{finnish}{\subject}{\aihe}},
+  }
+}{}
+\urlstyle{same}
+
+%moved after hyperred as can cause conflicts
+\usepackage{pdfcomment}%try the alt text for graphics
+\usepackage{accsupp}
+\newcommand{\AltText}[2]{\BeginAccSupp{method=pdfstringdef,unicode,Alt={{#1}}}\pdftooltip{{#2}}{{#1}}\EndAccSupp{}}
+
+\usepackage[top=2.5cm, bottom=3cm, left=4cm, right=2cm, nofoot]{geometry}
+
+\usepackage{pgfplots} %simple plots etc
+\pgfplotsset{compat=1.16}
+\usepackage{pgfplotstable}
+
+% Abbreviations, acronym and glossary, in case of bug, remove temporary the noredefwarn
+\usepackage[acronym,toc,nonumberlist,section=chapter,noredefwarn]{glossaries}%xindy,%toc, ,nomain
+\newglossarystyle{mystyle}{%
+  \setglossarystyle{list}% base this style on the list style
+  \renewcommand*{\glossentry}[2]{%
+  \item[\glsentryitem{##1}%
+    \glstarget{##1}{\glossentryname{##1}:}]
+  \glossentrydesc{##1}\glspostdescription\space ##2}
+}
+\setglossarystyle{mystyle}
+
+\renewcommand*{\glsclearpage}{}
