@@ -51,15 +51,15 @@ client.on("message", (topic, message) => {
     console.log("Extracted Data:", extractedData);
 
     // Check if the data contains BATT=
-    if (decodedData.includes("BATT=")) {
+    if (extractedData.data.includes("BATT=")) {
       // Insert battery status into battery column
       db.run(
-        "INSERT INTO activity (timestamp, battery) VALUES (?, ?)",
-        [extractedData.time, extractedData.data],
+        "INSERT INTO battery (battery) VALUES (?)",
+        [extractedData.data],
         function (err) {
           if (err) {
             return console.error(
-              "Error inserting into battery table:",
+              "Error inserting into activity table:",
               err.message
             );
           }
@@ -111,14 +111,16 @@ app.get("/latest-state", (req, res) => {
     "SELECT status FROM activity ORDER BY timestamp DESC LIMIT 1",
     [],
     (err, activityRow) => {
+      console.log(activityRow);
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
       db.get(
-        "SELECT battery FROM activity ORDER BY timestamp DESC LIMIT 1",
+        "SELECT battery FROM battery ORDER BY rowid DESC LIMIT 1",
         [],
         (err, batteryRow) => {
+          console.log(batteryRow);
           if (err) {
             res.status(500).json({ error: err.message });
             return;
