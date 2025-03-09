@@ -11,24 +11,59 @@
   <button onclick="window.location.href='/'">Home</button>
   <h2>Sensor Data</h2>
   <ul id="Database Data">Loading...</ul>
+  <div id="pagination">
+    <button id="prevPage" onclick="prevPage()" disabled>Previous</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage" onclick="nextPage()">Next</button>
+  </div>
 
   <script>
+    let currentPage = 1;
+    const itemsPerPage = 50;
+    let sensorData = [];
+
     async function fetchSensorData() {
       try {
         const response = await fetch('/sensor-data');
         const data = await response.json();
-        const sensorDataList = document.getElementById('Database Data');
-        sensorDataList.innerHTML = '';
-
-        // Access the `data` property which contains the array and reverse it
-        data.data.reverse().forEach(item => {
-          const listItem = document.createElement('li');
-          listItem.textContent = `Time: ${item.timestamp}, Status: ${item.status}`;
-          sensorDataList.appendChild(listItem);
-        });
+        sensorData = data.data.reverse(); // Reverse to show latest entries first
+        displayPage(currentPage);
       } catch (error) {
         console.error('Error fetching sensor data:', error);
         document.getElementById('Database Data').innerText = 'Error loading sensor data';
+      }
+    }
+
+    function displayPage(page) {
+      const sensorDataList = document.getElementById('Database Data');
+      sensorDataList.innerHTML = '';
+
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageData = sensorData.slice(start, end);
+
+      pageData.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Time: ${item.timestamp}, Status: ${item.status}`;
+        sensorDataList.appendChild(listItem);
+      });
+
+      document.getElementById('pageInfo').textContent = `Page ${page} of ${Math.ceil(sensorData.length / itemsPerPage)}`;
+      document.getElementById('prevPage').disabled = page === 1;
+      document.getElementById('nextPage').disabled = end >= sensorData.length;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        displayPage(currentPage);
+      }
+    }
+
+    function nextPage() {
+      if (currentPage * itemsPerPage < sensorData.length) {
+        currentPage++;
+        displayPage(currentPage);
       }
     }
 
