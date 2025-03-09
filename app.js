@@ -117,6 +117,10 @@ app.get("/logs", (req, res) => {
   res.sendFile(path.join(__dirname, "views/logs.html"));
 });
 
+app.get("/activity", (req, res) => {
+  res.sendFile(path.join(__dirname, "views/activity.html"));
+});
+
 app.get("/sensor-data", (req, res) => {
   db.all(
     "SELECT timestamp, status FROM activity ORDER BY rowid DESC LIMIT 500",
