@@ -20,8 +20,8 @@
         const sensorDataList = document.getElementById('Database Data');
         sensorDataList.innerHTML = '';
 
-        // Access the `data` property which contains the array
-        data.data.forEach(item => {
+        // Access the `data` property which contains the array and reverse it
+        data.data.reverse().forEach(item => {
           const listItem = document.createElement('li');
           listItem.textContent = `Time: ${item.timestamp}, Status: ${item.status}`;
           sensorDataList.appendChild(listItem);
