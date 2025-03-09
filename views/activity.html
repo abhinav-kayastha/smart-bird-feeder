@@ -29,10 +29,14 @@
     const graphTitles = ['Hourly Activity Data', 'Weekly Activity Data', 'Daily Activity Data for Current Month', 'Monthly Activity Data'];
 
     let hourlyChart, weeklyChart, monthlyChart, yearlyChart;
-    let hours = Array(24).fill(0);
-    let days = Array(7).fill(0);
-    let daily = Array(31).fill(0); // Assuming a maximum of 31 days in a month
-    let months = Array(12).fill(0);
+    let hoursUnlocked = Array(24).fill(0);
+    let hoursLocked = Array(24).fill(0);
+    let daysUnlocked = Array(7).fill(0);
+    let daysLocked = Array(7).fill(0);
+    let dailyUnlocked = Array(31).fill(0); // Assuming a maximum of 31 days in a month
+    let dailyLocked = Array(31).fill(0);
+    let monthsUnlocked = Array(12).fill(0);
+    let monthsLocked = Array(12).fill(0);
 
     async function fetchActivityData() {
       try {
@@ -41,30 +45,40 @@
         const activityData = data.data;
 
         // Process data to get the number of entries per hour, day, month, and day of the current month
-        hours = Array(24).fill(0);
-        days = Array(7).fill(0);
-        daily = Array(31).fill(0);
-        months = Array(12).fill(0);
+        hoursUnlocked = Array(24).fill(0);
+        hoursLocked = Array(24).fill(0);
+        daysUnlocked = Array(7).fill(0);
+        daysLocked = Array(7).fill(0);
+        dailyUnlocked = Array(31).fill(0);
+        dailyLocked = Array(31).fill(0);
+        monthsUnlocked = Array(12).fill(0);
+        monthsLocked = Array(12).fill(0);
 
         activityData.forEach(item => {
           const [date, time] = item.timestamp.split(', ');
           const [day, month, year] = date.split('/');
           const hour = parseInt(time.split(':')[0], 10);
-
-          // Update hourly data
-          hours[hour]++;
-
-          // Update daily data (assuming the first day of the week is Sunday)
           const dayOfWeek = new Date(`${year}-${month}-${day}`).getDay();
-          days[dayOfWeek]++;
+          const dayOfMonth = parseInt(day, 10) - 1;
+          const monthIndex = parseInt(month, 10) - 1;
 
-          // Update daily data for the current month
-          if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
-            daily[parseInt(day, 10) - 1]++;
+          if (item.status === 'Unlocked') {
+            // Update unlocked data
+            hoursUnlocked[hour]++;
+            daysUnlocked[dayOfWeek]++;
+            if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
+              dailyUnlocked[dayOfMonth]++;
+            }
+            monthsUnlocked[monthIndex]++;
+          } else if (item.status === 'Locked') {
+            // Update locked data
+            hoursLocked[hour]++;
+            daysLocked[dayOfWeek]++;
+            if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
+              dailyLocked[dayOfMonth]++;
+            }
+            monthsLocked[monthIndex]++;
           }
-
-          // Update monthly data
-          months[parseInt(month, 10) - 1]++;
         });
 
         // Create the charts
@@ -79,14 +93,23 @@
       hourlyChart = new Chart(hourlyCtx, {
         type: 'bar',
         data: {
-          labels: Array.from({ length: 24 }, (_, i) => `${i}:00 - ${i}:59`),
-          datasets: [{
-            label: 'Number of Data Entries',
-            data: hours,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
+          labels: Array.from({ length: 24 }, (_, i) => `${i}`),
+          datasets: [
+            {
+              label: 'Unlocked',
+              data: hoursUnlocked,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Locked',
+              data: hoursLocked,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: {
@@ -105,13 +128,22 @@
         type: 'bar',
         data: {
           labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-          datasets: [{
-            label: 'Number of Data Entries',
-            data: days,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              label: 'Unlocked',
+              data: daysUnlocked,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Locked',
+              data: daysLocked,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: {
@@ -130,13 +162,22 @@
         type: 'bar',
         data: {
           labels: Array.from({ length: 31 }, (_, i) => `${i + 1}`),
-          datasets: [{
-            label: 'Number of Data Entries',
-            data: daily,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              label: 'Unlocked',
+              data: dailyUnlocked,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Locked',
+              data: dailyLocked,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: {
@@ -155,13 +196,22 @@
         type: 'bar',
         data: {
           labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-          datasets: [{
-            label: 'Number of Data Entries',
-            data: months,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              label: 'Unlocked',
+              data: monthsUnlocked,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Locked',
+              data: monthsLocked,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
         },
         options: {
           scales: {
@@ -185,43 +235,57 @@
           const activityData = data.data;
 
           // Process data to get the number of entries per hour, day, month, and day of the current month
-          hours = Array(24).fill(0);
-          days = Array(7).fill(0);
-          daily = Array(31).fill(0);
-          months = Array(12).fill(0);
+          hoursUnlocked = Array(24).fill(0);
+          hoursLocked = Array(24).fill(0);
+          daysUnlocked = Array(7).fill(0);
+          daysLocked = Array(7).fill(0);
+          dailyUnlocked = Array(31).fill(0);
+          dailyLocked = Array(31).fill(0);
+          monthsUnlocked = Array(12).fill(0);
+          monthsLocked = Array(12).fill(0);
 
           activityData.forEach(item => {
             const [date, time] = item.timestamp.split(', ');
             const [day, month, year] = date.split('/');
             const hour = parseInt(time.split(':')[0], 10);
-
-            // Update hourly data
-            hours[hour]++;
-
-            // Update daily data (assuming the first day of the week is Sunday)
             const dayOfWeek = new Date(`${year}-${month}-${day}`).getDay();
-            days[dayOfWeek]++;
+            const dayOfMonth = parseInt(day, 10) - 1;
+            const monthIndex = parseInt(month, 10) - 1;
 
-            // Update daily data for the current month
-            if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
-              daily[parseInt(day, 10) - 1]++;
+            if (item.status === 'Unlocked') {
+              // Update unlocked data
+              hoursUnlocked[hour]++;
+              daysUnlocked[dayOfWeek]++;
+              if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
+                dailyUnlocked[dayOfMonth]++;
+              }
+              monthsUnlocked[monthIndex]++;
+            } else if (item.status === 'Locked') {
+              // Update locked data
+              hoursLocked[hour]++;
+              daysLocked[dayOfWeek]++;
+              if (parseInt(month, 10) === new Date().getMonth() + 1 && parseInt(year, 10) === new Date().getFullYear()) {
+                dailyLocked[dayOfMonth]++;
+              }
+              monthsLocked[monthIndex]++;
             }
-
-            // Update monthly data
-            months[parseInt(month, 10) - 1]++;
           });
 
           // Update the chart data
-          hourlyChart.data.datasets[0].data = hours;
+          hourlyChart.data.datasets[0].data = hoursUnlocked;
+          hourlyChart.data.datasets[1].data = hoursLocked;
           hourlyChart.update();
 
-          weeklyChart.data.datasets[0].data = days;
+          weeklyChart.data.datasets[0].data = daysUnlocked;
+          weeklyChart.data.datasets[1].data = daysLocked;
           weeklyChart.update();
 
-          monthlyChart.data.datasets[0].data = daily;
+          monthlyChart.data.datasets[0].data = dailyUnlocked;
+          monthlyChart.data.datasets[1].data = dailyLocked;
           monthlyChart.update();
 
-          yearlyChart.data.datasets[0].data = months;
+          yearlyChart.data.datasets[0].data = monthsUnlocked;
+          yearlyChart.data.datasets[1].data = monthsLocked;
           yearlyChart.update();
         })
         .catch(error => console.error('Error updating charts:', error));
