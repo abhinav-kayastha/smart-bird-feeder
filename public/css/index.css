@@ -1,2 +1,43 @@
-/* index.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
+h1 {
+    color: #333;
+    margin-top: 20px;
+}
+
+p {
+    color: #666;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#device-state, #battery-status {
+    font-size: 18px;
+    color: #333;
+}
+
+h2 {
+    color: #333;
+    margin-top: 20px;
+}

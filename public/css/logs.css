@@ -15,7 +15,6 @@ h1 {
 
 p {
     color: #666;
-    margin: 10px 0;
 }
 
 button {
@@ -33,21 +32,31 @@ button:hover {
     background-color: #0056b3;
 }
 
-#graphTitle {
-    color: #333;
-    margin-top: 20px;
+#Database Data {
+    list-style-type: none;
+    padding: 0;
+    width: 80%;
+    max-width: 800px;
+    margin: 20px 0;
 }
 
-#graphContainer {
-    width: 90%;
-    max-width: 1200px; /* Increased max-width */
-    margin: 20px 0;
+#Database Data li {
+    background-color: white;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 #pagination {
     display: flex;
     justify-content: space-between;
-    width: 90%;
-    max-width: 1200px; /* Increased max-width */
+    width: 80%;
+    max-width: 800px;
     margin-bottom: 20px;
+}
+
+#pageInfo {
+    font-size: 16px;
+    color: #333;
 }
