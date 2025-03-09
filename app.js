@@ -8,6 +8,7 @@ const app = express();
 // Create variables for MQTT use here
 const address = "mqtt://192.168.50.192:1883";
 const topic = "application/+/device/+/rx";
+const publishTopic = "application/178/device/2cf7f1203230e7b3/tx";
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
@@ -97,8 +98,8 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views/index.html"));
 });
 
-app.get("/activity", (req, res) => {
-  res.sendFile(path.join(__dirname, "views/activity.html"));
+app.get("/logs", (req, res) => {
+  res.sendFile(path.join(__dirname, "views/logs.html"));
 });
 
 app.get("/sensor-data", (req, res) => {
@@ -136,6 +137,23 @@ app.get("/latest-state", (req, res) => {
       );
     }
   );
+});
+
+app.post("/send-command", (req, res) => {
+  const { data } = req.body;
+  const message = JSON.stringify({
+    confirmed: false,
+    fPort: 10,
+    data: data,
+  });
+
+  client.publish(publishTopic, message, (err) => {
+    if (err) {
+      console.error("Error publishing MQTT message:", err.message);
+      return res.status(500).json({ message: "Error sending command" });
+    }
+    res.json({ message: "Command sent successfully" });
+  });
 });
 
 app.listen(3000, () => {
