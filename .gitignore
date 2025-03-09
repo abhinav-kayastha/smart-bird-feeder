@@ -1,2 +1,7 @@
 node_modules/
 mqtt.py
+
+# IDE-generated or build files
+Bare_Metal/.generated_files/
+# macOS metadata
+.DS_Store

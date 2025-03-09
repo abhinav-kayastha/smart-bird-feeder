@@ -293,7 +293,7 @@ int main(void)
 
     // 5) Battery reading interval
     uint32_t lastBatteryTime   = 0;
-    const uint32_t BATT_PERIOD = 6000U;  // 600 => ~10 min if TMR1 is 1 second
+    const uint32_t BATT_PERIOD = 60000U;  // 600 => ~10 min if TMR1 is 1 second
 
     // 6) Main loop
     int last_ra7 = -1;
