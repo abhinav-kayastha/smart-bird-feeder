@@ -26,7 +26,7 @@
       try {
         const response = await fetch('/sensor-data');
         const data = await response.json();
-        sensorData = data.data.reverse(); // Reverse to show latest entries first
+        sensorData = data.data; // No need to reverse as the latest entries are already first
         displayPage(currentPage);
       } catch (error) {
         console.error('Error fetching sensor data:', error);

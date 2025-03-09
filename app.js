@@ -103,13 +103,17 @@ app.get("/logs", (req, res) => {
 });
 
 app.get("/sensor-data", (req, res) => {
-  db.all("SELECT timestamp, status FROM activity", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  db.all(
+    "SELECT timestamp, status FROM activity ORDER BY rowid DESC LIMIT 100",
+    [],
+    (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ data: rows });
     }
-    res.json({ data: rows });
-  });
+  );
 });
 
 app.get("/latest-state", (req, res) => {
