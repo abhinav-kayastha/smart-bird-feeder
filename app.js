@@ -3,7 +3,10 @@ const mqtt = require("mqtt");
 const path = require("path");
 const bodyParser = require("body-parser");
 const db = require("./config/database");
+const WebSocket = require("ws");
 const app = express();
+const server = require("http").createServer(app);
+const wss = new WebSocket.Server({ server });
 
 // Create variables for MQTT use here
 const address = "mqtt://localhost:1883"; // address of the Lorix IP MQTT broker
@@ -70,6 +73,12 @@ client.on("message", (topic, message) => {
             );
           }
           console.log(`Inserted battery record with ID: ${this.lastID}`);
+          // Notify all connected WebSocket clients about the new data
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type: "new-data" }));
+            }
+          });
         }
       );
     } else {
@@ -85,6 +94,12 @@ client.on("message", (topic, message) => {
             );
           }
           console.log(`Inserted activity record with ID: ${this.lastID}`);
+          // Notify all connected WebSocket clients about the new data
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type: "new-data" }));
+            }
+          });
         }
       );
     }
@@ -160,7 +175,7 @@ app.post("/send-command", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
 

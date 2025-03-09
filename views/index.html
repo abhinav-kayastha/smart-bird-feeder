@@ -53,6 +53,16 @@
 
         // Fetch the latest state when the page loads
         window.onload = fetchLatestState;
+
+        // WebSocket connection to receive real-time updates
+        const socket = new WebSocket('ws://' + window.location.host);
+
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            if (message.type === 'new-data') {
+                fetchLatestState();
+            }
+        };
     </script>
 </body>
 </html>
