@@ -104,7 +104,7 @@ app.get("/logs", (req, res) => {
 
 app.get("/sensor-data", (req, res) => {
   db.all(
-    "SELECT timestamp, status FROM activity ORDER BY rowid DESC LIMIT 100",
+    "SELECT timestamp, status FROM activity ORDER BY rowid DESC LIMIT 500",
     [],
     (err, rows) => {
       if (err) {
