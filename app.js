@@ -9,8 +9,8 @@ const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Create variables for MQTT use here
-const address = "mqtt://localhost:1883"; // address of the Lorix IP MQTT broker
-const topic = "application/device/rx"; // add the pluses between the slashes application/+/device/+/rx
+const address = "mqtt://192.168.50.192:1883"; // address of the Lorix IP MQTT broker
+const topic = "application/+/device/+/rx"; // add the pluses between the slashes application/+/device/+/rx
 const publishTopic = "application/178/device/2cf7f1203230e7b3/tx";
 
 app.use(bodyParser.json());
@@ -49,7 +49,7 @@ client.on("message", (topic, message) => {
     console.log("Current Time:", currentTime);
 
     const extractedData = {
-      data: parsedMessage.data, // TODO: Replace with decodedData
+      data: decodedData, // TODO: Replace with decodedData
       time: currentTime,
     };
 
