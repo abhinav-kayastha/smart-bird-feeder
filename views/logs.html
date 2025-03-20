@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs</title>
+  <link rel="stylesheet" href="../css/logs.css">
+</head>
+<body>
+  <h1>Logs</h1>
+  <p>Here you can see the logs of the Smart Bird Feeder.</p>
+  <button onclick="window.location.href='/'">Home</button>
+  <button onclick="window.location.href='/activity'">Activity</button>
+  <button onclick="downloadLogs()">Download Logs</button>
+  <h2>Sensor Data</h2>
+  <ul id="Database Data">Loading...</ul>
+  <div id="pagination">
+    <button id="prevPage" onclick="prevPage()" disabled>Previous</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage" onclick="nextPage()">Next</button>
+  </div>
+
+  <script src="js/logs.js"></script>
+</body>
+</html>

@@ -8,28 +8,19 @@
 </head>
 <body>
     <h1>Smart Bird Feeder Application</h1>
-    <p>Use the link below to navigate through the application:</p>
-    <ul>
-        <li><a href="/activity">Activity Monitor</a></li>
-    </ul>
+    <p>Use the buttons below to navigate through the application:</p>
+    <button onclick="window.location.href='/logs'">Logs</button>
+    <button onclick="window.location.href='/activity'">Activity</button>
 
     <h2>Device State</h2>
     <p id="device-state">Loading...</p>
+    <h2>Battery Status</h2>
+    <p id="battery-status">Loading...</p>
 
-    <script>
-        async function fetchLatestState() {
-            try {
-                const response = await fetch('/latest-state');
-                const data = await response.json();
-                document.getElementById('device-state').textContent = data.state;
-            } catch (error) {
-                console.error('Error fetching latest state:', error);
-                document.getElementById('device-state').textContent = 'Error fetching state';
-            }
-        }
+    <h2>Control</h2>
+    <button onclick="sendCommand('MQ==')">Lock</button>
+    <button onclick="sendCommand('MA==')">Unlock</button>
 
-        // Fetch the latest state when the page loads
-        window.onload = fetchLatestState;
-    </script>
+    <script src="js/index.js"></script>
 </body>
 </html>
